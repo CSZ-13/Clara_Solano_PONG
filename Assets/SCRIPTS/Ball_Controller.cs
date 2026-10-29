@@ -7,6 +7,7 @@ public class Ball_Controller : MonoBehaviour
 {
     public float velocidad = 10f;
     public Game_Manager Manager;
+    public Scene_Controller Scene;
     private Rigidbody2D _rb;
     private float tiempoAtascada = 0f;
     float _lastHorizontalDirection = 1f;
@@ -65,9 +66,9 @@ public class Ball_Controller : MonoBehaviour
                 isRight = true;
             }
         }
-        else if(dir == 1)
+        else if (dir == 1)
         {
-            isRight = true;      
+            isRight = true;
         }
 
 
@@ -88,13 +89,29 @@ public class Ball_Controller : MonoBehaviour
         if (collision.gameObject.CompareTag("Wall_R"))
         {
             Manager.Player1++;
-            LaunchBall(-1);
+            if (Manager.Player1 == 5)
+            {
+                Scene.mainMenu();
+            }
+            else
+            {
+                LaunchBall(-1);
+            }
+
         }
 
         if (collision.gameObject.CompareTag("Wall_L"))
         {
             Manager.Player2++;
-            LaunchBall(1);
+            if (Manager.Player2 == 5)
+            {
+                Scene.mainMenu();
+            }
+            else
+            {
+                LaunchBall(1);
+            }
+
         }
 
         Manager.UpdatePointsText();
