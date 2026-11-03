@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UIElements;
 
 public class Ball_Controller : MonoBehaviour
@@ -11,6 +12,10 @@ public class Ball_Controller : MonoBehaviour
     private Rigidbody2D _rb;
     private float tiempoAtascada = 0f;
     float _lastHorizontalDirection = 1f;
+    private AudioSource _AudioSource;
+
+    public float timeAlive = 0f;
+    float velocityMulty = 1;
 
 
     // Start is called before the first frame update
@@ -18,9 +23,20 @@ public class Ball_Controller : MonoBehaviour
     {
         _rb = this.gameObject.GetComponent<Rigidbody2D>();
         _rb.velocity = new Vector3(Random.Range(0, 2), Random.Range(-0.5f, 0.5f)).normalized * velocidad;
+        _AudioSource = GetComponent<AudioSource>();
+        
         LaunchBall(0);
     }
 
+    private void Update()
+    {
+        timeAlive += Time.deltaTime;
+        if (timeAlive > 2f)
+        {
+            velocityMulty += 0.25f;
+            timeAlive = 0f;
+        }
+    }
     // Update is called once per frame
     void FixedUpdate()
     {
@@ -86,15 +102,19 @@ public class Ball_Controller : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        
         if (collision.gameObject.CompareTag("Wall_R"))
         {
+            
             Manager.Player1++;
             if (Manager.Player1 == 5)
             {
+                Manager.WinSound();
                 Scene.mainMenu();
             }
             else
             {
+                Manager.ScoreSound();
                 LaunchBall(-1);
             }
 
@@ -102,17 +122,23 @@ public class Ball_Controller : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Wall_L"))
         {
+            
             Manager.Player2++;
             if (Manager.Player2 == 5)
             {
+                Manager.WinSound();
                 Scene.mainMenu();
             }
             else
             {
+                Manager.ScoreSound();
                 LaunchBall(1);
             }
 
         }
+        
+        _AudioSource.pitch = Random.Range(0.8f, 1.5f);
+        _AudioSource.Play();
 
         Manager.UpdatePointsText();
 
