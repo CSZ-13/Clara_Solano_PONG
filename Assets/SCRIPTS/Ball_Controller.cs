@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 public class Ball_Controller : MonoBehaviour
 {
-    public float velocidad = 10f;
+    public float ballVelocity = 10f;
     public Game_Manager Manager;
     public Scene_Controller Scene;
     private Rigidbody2D _rb;
@@ -15,14 +15,18 @@ public class Ball_Controller : MonoBehaviour
     private AudioSource _AudioSource;
 
     public float timeAlive = 0f;
-    float velocityMulty = 1;
+    float velocityMulty = 1f;
 
+    public GameObject p1WinPanel;
+    public GameObject p2WinPanel;
 
     // Start is called before the first frame update
     void Start()
     {
+
+        Time.timeScale = 1f;
         _rb = this.gameObject.GetComponent<Rigidbody2D>();
-        _rb.velocity = new Vector3(Random.Range(0, 2), Random.Range(-0.5f, 0.5f)).normalized * velocidad;
+        _rb.velocity = new Vector3(Random.Range(0, 2), Random.Range(-0.5f, 0.5f)).normalized * ballVelocity;
         _AudioSource = GetComponent<AudioSource>();
         
         LaunchBall(0);
@@ -31,21 +35,23 @@ public class Ball_Controller : MonoBehaviour
     private void Update()
     {
         timeAlive += Time.deltaTime;
-        if (timeAlive > 2f)
+        if (timeAlive > 2f && velocityMulty <2f)
         {
+            ballVelocity = 10f;
             velocityMulty += 0.25f;
+            ballVelocity *= velocityMulty;
             timeAlive = 0f;
         }
     }
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (_rb.velocity.magnitude > velocidad)
+        if (_rb.velocity.magnitude > ballVelocity)
         {
-            _rb.velocity = _rb.velocity.normalized * velocidad;
+            _rb.velocity = _rb.velocity.normalized * ballVelocity;
         }
 
-        if (Mathf.Abs(_rb.velocity.x) >= velocidad * 0.3f)
+        if (Mathf.Abs(_rb.velocity.x) >= ballVelocity * 0.3f)
         {
             _lastHorizontalDirection = Mathf.Sign(_rb.velocity.x);
         }
@@ -64,12 +70,15 @@ public class Ball_Controller : MonoBehaviour
             _rb.velocity = new Vector2(
                 _lastHorizontalDirection * minX,
                 yDirection * y
-            ) * velocidad;
+            ) * ballVelocity;
         }
     }
 
     void LaunchBall(int dir)
     {
+        velocityMulty = 1f;
+        ballVelocity = 10f;
+        timeAlive = 0f;
 
         this.transform.position = new Vector3(0, 0, 0);
 
@@ -96,21 +105,23 @@ public class Ball_Controller : MonoBehaviour
         }
 
         float yVelocity = Random.Range(-1f, 1f);
-        _rb.velocity = new Vector2(xVelocity * velocidad, yVelocity * velocidad);
+        _rb.velocity = new Vector2(xVelocity * ballVelocity, yVelocity * ballVelocity);
 
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         
-        if (collision.gameObject.CompareTag("Wall_R"))
+        if (collision.gameObject.CompareTag("Wall_L"))
         {
             
             Manager.Player1++;
             if (Manager.Player1 == 5)
             {
                 Manager.WinSound();
-                Scene.mainMenu();
+                p1WinPanel.SetActive(true);
+                Time.timeScale = 0f;
+               
             }
             else
             {
@@ -120,14 +131,16 @@ public class Ball_Controller : MonoBehaviour
 
         }
 
-        if (collision.gameObject.CompareTag("Wall_L"))
+        if (collision.gameObject.CompareTag("Wall_R"))
         {
             
             Manager.Player2++;
             if (Manager.Player2 == 5)
             {
                 Manager.WinSound();
-                Scene.mainMenu();
+                p2WinPanel.SetActive(true);
+                Time.timeScale = 0f;
+               
             }
             else
             {

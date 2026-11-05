@@ -8,20 +8,34 @@ public class Player_Controler : MonoBehaviour
     public float topHeight = 3.5f; //top limit of paddle
     public float bottomHeight = -3.5f; //bottom limit of paddle
     public bool useArrowKeys = false; //if activated move with arros, if not W and S
-
+   
+    public bool IA;
+    public GameObject ball;
 
     void Update()
     {
-        MovePaddle();
+        if (IA == false)
+        {
+            MovePaddle();
+        }
+        else
+        {
+            MovePaddleIA();
+        }
     }
 
     void MovePaddle() //
-    { 
-         this.gameObject.transform.position = new Vector3(transform.position.x, ConstrainPaddle(), transform.position.z);
+    {
+        this.gameObject.transform.position = new Vector3(transform.position.x, ConstrainPaddle(), transform.position.z);
     }
-    
-    float ConstrainPaddle() //makes sure paddle doesnt go over limits
+
+    void MovePaddleIA()
     { 
+    
+    }
+
+    float ConstrainPaddle() //makes sure paddle doesnt go over limits
+    {
         float nuevaY = this.gameObject.transform.position.y + (PaddleDirection() * moveSpeed * Time.deltaTime);
 
         if (nuevaY > topHeight)
